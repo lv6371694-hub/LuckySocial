@@ -1,1 +1,45 @@
+async function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
+    const res = await fetch("/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username,
+            password
+        })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+        alert("Invalid username or password");
+        return;
+    }
+
+    loadFeed();
+}
+
+async function loadFeed() {
+    const res = await fetch("/api/posts");
+    const posts = await res.json();
+
+    let html = "";
+
+    posts.forEach(post => {
+        html += `
+        <div class="post">
+            <h3>${post.user}</h3>
+            <p>${post.text}</p>
+            <div class="actions">
+                ❤️ ${post.likes}
+            </div>
+            <input class="comment" placeholder="Write a comment...">
+        </div>`;
+    });
+
+    document.getElementById("feed").innerHTML = html;
+    }

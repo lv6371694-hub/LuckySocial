@@ -1,59 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>LuckySocial 🚀</title>
-
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuckySocial</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<header>
-<h1>LuckySocial 🚀</h1>
+<header class="topbar">
+  <div class="logo">LuckySocial</div>
+  <div class="top-actions">
+    <button onclick="showCreate()">＋</button>
+    <button>♡</button>
+    <button>✉</button>
+  </div>
 </header>
 
-<div class="container">
+<main>
 
-<div id="loginBox">
+<section id="loginSection" class="auth-card">
+  <h2>LuckySocial</h2>
+  <p>Share your moments with friends</p>
 
-<h2>Login</h2>
+  <input id="username" type="text" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
 
-<input type="text" id="username" placeholder="Username">
+  <button class="primary-btn" onclick="login()">Log In</button>
 
-<input type="password" id="password" placeholder="Password">
+  <p class="signup-text">
+    Don't have an account?
+    <button class="link-btn" onclick="showSignup()">Sign up</button>
+  </p>
+</section>
 
-<button onclick="login()">Login</button>
+<section id="signupSection" class="auth-card hidden">
+  <h2>Create account</h2>
 
-<p>
-Don't have an account?
-<a href="#" onclick="signup()">Sign Up</a>
-</p>
+  <input id="signupUsername" type="text" placeholder="Username">
+  <input id="signupPassword" type="password" placeholder="Password">
 
-<div id="msg"></div>
+  <button class="primary-btn" onclick="signup()">Sign Up</button>
 
-</div>
+  <p class="signup-text">
+    Already have an account?
+    <button class="link-btn" onclick="showLogin()">Log in</button>
+  </p>
+</section>
 
-<div id="feed" style="display:none;">
+<section id="feedSection" class="hidden">
 
-<h2>Home Feed</h2>
+  <div class="stories">
+    <div class="story">
+      <div class="story-img">＋</div>
+      <span>Your story</span>
+    </div>
 
-<div class="newPost">
+    <div class="story">
+      <div class="story-img">L</div>
+      <span>Lucky</span>
+    </div>
 
-<textarea id="postText" placeholder="What's on your mind?"></textarea>
+    <div class="story">
+      <div class="story-img">S</div>
+      <span>Friends</span>
+    </div>
 
-<button onclick="createPost()">Post</button>
+    <div class="story">
+      <div class="story-img">A</div>
+      <span>Ajay</span>
+    </div>
+  </div>
 
-</div>
+  <div id="posts"></div>
 
-<div id="posts"></div>
+</section>
 
-</div>
+</main>
 
+<nav id="bottomNav" class="bottom-nav hidden">
+  <button onclick="loadPosts()">⌂</button>
+  <button>⌕</button>
+  <button onclick="showCreate()">＋</button>
+  <button>♡</button>
+  <button>👤</button>
+</nav>
+
+<div id="createBox" class="modal hidden">
+  <div class="modal-content">
+    <button class="close-btn" onclick="hideCreate()">×</button>
+    <h2>Create post</h2>
+
+    <textarea id="postText" placeholder="What's on your mind?"></textarea>
+
+    <button class="primary-btn" onclick="createPost()">Post</button>
+  </div>
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>

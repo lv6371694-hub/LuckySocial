@@ -1,134 +1,206 @@
+let currentUser = null;
+
+function showSignup() {
+  document.getElementById("loginSection").classList.add("hidden");
+  document.getElementById("signupSection").classList.remove("hidden");
+}
+
+function showLogin() {
+  document.getElementById("signupSection").classList.add("hidden");
+  document.getElementById("loginSection").classList.remove("hidden");
+}
+
 async function login() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
 
-const username = document.getElementById("username").value;
-const password = document.getElementById("password").value;
+  if (!username || !password) {
+    alert("Username aur password enter karo");
+    return;
+  }
 
-const res = await fetch("/login",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-username,
-password
-})
-});
+  try {
+    const response = await fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    });
 
-const data = await res.json();
+    const data = await response.json();
 
-if(data.success){
+    if (!response.ok) {
+      alert(data.message || "Login failed");
+      return;
+    }
 
-document.getElementById("loginBox").style.display="none";
-document.getElementById("feed").style.display="block";
+    currentUser = username;
 
-loadPosts();
+    document.getElementById("loginSection").classList.add("hidden");
+    document.getElementById("signupSection").classList.add("hidden");
+    document.getElementById("feedSection").classList.remove("hidden");
+    document.getElementById("bottomNav").classList.remove("hidden");
 
-}else{
+    loadPosts();
 
-document.getElementById("msg").innerHTML=data.message;
-
+  } catch (error) {
+    console.error(error);
+    alert("Server se connection nahi ho raha");
+  }
 }
 
+async function signup() {
+  const username = document.getElementById("signupUsername").value.trim();
+  const password = document.getElementById("signupPassword").value;
+
+  if (!username || !password) {
+    alert("Username aur password enter karo");
+    return;
+  }
+
+  try {
+    const response = await fetch("/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Signup failed");
+      return;
+    }
+
+    alert("Account successfully created!");
+
+    document.getElementById("signupUsername").value = "";
+    document.getElementById("signupPassword").value = "";
+
+    showLogin();
+
+  } catch (error) {
+    console.error(error);
+    alert("Server se connection nahi ho raha");
+  }
 }
 
-async function signup(){
+async function loadPosts() {
+  const postsContainer = document.getElementById("posts");
 
-const username=prompt("Choose Username");
-const password=prompt("Choose Password");
+  try {
+    const response = await fetch("/api/posts");
 
-if(!username||!password)return;
+    if (!response.ok) {
+      postsContainer.innerHTML = "<p>Posts load nahi ho rahe.</p>";
+      return;
+    }
 
-const res=await fetch("/signup",{
+    const posts = await response.json();
 
-method:"POST",
+    if (!posts || posts.length === 0) {
+      postsContainer.innerHTML = `
+        <div style="padding:40px;text-align:center;color:#777">
+          <h3>No posts yet</h3>
+          <p>Apna pehla post create karo.</p>
+        </div>
+      `;
+      return;
+    }
 
-headers:{
-"Content-Type":"application/json"
-},
+    postsContainer.innerHTML = posts.map(post => `
+      <article style="
+        background:#fff;
+        border-bottom:1px solid #ddd;
+        margin-top:10px;
+      ">
+        <div style="
+          padding:12px;
+          font-weight:bold;
+        ">
+          👤 ${escapeHTML(post.username || post.user || "Lucky")}
+        </div>
 
-body:JSON.stringify({
-username,
-password
-})
+        ${
+          post.image
+          ? `<img src="${post.image}" style="width:100%;display:block;">`
+          : ""
+        }
 
-});
+        <div style="padding:12px">
+          <div style="font-size:24px;margin-bottom:8px">
+            ♡ 💬 ↗
+          </div>
 
-const data=await res.json();
+          <div>
+            ${escapeHTML(post.text || post.content || "")}
+          </div>
+        </div>
+      </article>
+    `).join("");
 
-alert(data.message);
+  } catch (error) {
+    console.error(error);
 
+    postsContainer.innerHTML = `
+      <div style="padding:30px;text-align:center;color:#777">
+        Posts load nahi ho rahe.
+      </div>
+    `;
+  }
 }
 
-async function loadPosts(){
+async function createPost() {
+  const text = document.getElementById("postText").value.trim();
 
-const res=await fetch("/api/posts");
+  if (!text) {
+    alert("Post me kuch likho");
+    return;
+  }
 
-const posts=await res.json();
+  try {
+    const response = await fetch("/api/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: currentUser || "Lucky",
+        text: text
+      })
+    });
 
-let html="";
+    const data = await response.json();
 
-posts.forEach(post=>{
+    if (!response.ok) {
+      alert(data.message || "Post create nahi hua");
+      return;
+    }
 
-html+=`
+    document.getElementById("postText").value = "";
 
-<div class="post">
+    hideCreate();
+    loadPosts();
 
-<h3>${post.user}</h3>
-
-<p>${post.text}</p>
-
-<button onclick="likePost('${post.id}')">
-❤️ ${post.likes}
-</button>
-
-</div>
-
-`;
-
-});
-
-document.getElementById("posts").innerHTML=html;
-
+  } catch (error) {
+    console.error(error);
+    alert("Server se connection nahi ho raha");
+  }
 }
 
-async function likePost(id){
-
-await fetch("/api/posts/"+id+"/like",{
-
-method:"POST"
-
-});
-
-loadPosts();
-
+function showCreate() {
+  document.getElementById("createBox").classList.remove("hidden");
 }
 
-async function createPost(){
+function hideCreate() {
+  document.getElementById("createBox").classList.add("hidden");
+}
 
-const text=document.getElementById("postText").value;
-
-if(text==="") return;
-
-await fetch("/api/posts",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-user:"You",
-
-text:text
-
-})
-
-});
-
-document.getElementById("postText").value="";
-
-loadPosts();
-
+function escapeHTML(value) {
+  const div = document.createElement("div");
+  div.textContent = value ?? "";
+  return div.innerHTML;
 }

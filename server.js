@@ -88,7 +88,7 @@ app.get("/api/posts", (req, res) => {
 
 // Create Post
 app.post("/api/posts", (req, res) => {
-  const { user, text } = req.body;
+  const user = req.body.user || req.body.username || "Lucky"; const text = req.body.text || req.body.content || "";
 
   posts.unshift({
     id: uuidv4(),

@@ -1,2 +1,6 @@
 .env
 node_modules/
+
+.env
+*.backup
+server.js.before-mongodb

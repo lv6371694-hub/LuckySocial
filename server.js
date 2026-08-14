@@ -247,7 +247,63 @@ app.post("/api/posts/:id/comment", async (req, res) => {
     });
   }
 });
+// Follow / Unfollow
+app.post("/api/users/:username/follow", async (req, res) => {
+  try {
+    const targetUsername = req.params.username;
+    const currentUsername = req.body.username;
 
+    if (!currentUsername) {
+      return res.status(400).json({
+        success: false,
+        message: "Username required"
+      });
+    }
+
+    if (targetUsername === currentUsername) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot follow yourself"
+      });
+    }
+
+    const currentUser = await User.findOne({ username: currentUsername });
+    const targetUser = await User.findOne({ username: targetUsername });
+
+    if (!currentUser || !targetUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const alreadyFollowing = currentUser.following.includes(targetUsername);
+
+    if (alreadyFollowing) {
+      currentUser.following.pull(targetUsername);
+      targetUser.followers.pull(currentUsername);
+    } else {
+      currentUser.following.push(targetUsername);
+      targetUser.followers.push(currentUsername);
+    }
+
+    await currentUser.save();
+    await targetUser.save();
+
+    res.json({
+      success: true,
+      following: !alreadyFollowing,
+      followers: targetUser.followers.length
+    });
+
+  } catch (err) {
+    console.error("Follow error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to follow user"
+    });
+  }
+});
 // Start Server
 app.listen(PORT, () => {
   console.log(`LuckySocial running on port ${PORT}`);

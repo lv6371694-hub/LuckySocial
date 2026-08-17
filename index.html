@@ -1,102 +1,594 @@
+cd ~/mysite/LuckySocial
+cat > index.html <<'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
   <title>LuckySocial</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
 
-<header class="topbar">
-  <div class="logo">LuckySocial</div>
-  <div class="top-actions">
-    <button onclick="showCreate()">＋</button>
-    <button>♡</button>
-    <button>✉</button>
+<!-- ================= LOGIN ================= -->
+
+<section id="loginSection" class="auth-screen">
+
+  <div class="auth-card">
+
+    <div class="brand">LuckySocial</div>
+
+    <p class="auth-subtitle">
+      Connect with friends and share your world.
+    </p>
+
+    <input
+      id="loginUsername"
+      type="text"
+      placeholder="Username"
+      autocomplete="username"
+    >
+
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="Password"
+      autocomplete="current-password"
+    >
+
+    <button class="primary-btn" onclick="login()">
+      Log in
+    </button>
+
+    <div id="loginMessage"></div>
+
+    <div class="auth-divider">
+      <span>OR</span>
+    </div>
+
+    <p class="switch-auth">
+      Don't have an account?
+      <button onclick="showSignup()">Sign up</button>
+    </p>
+
   </div>
-</header>
-
-<main>
-
-<section id="loginSection" class="auth-card">
-  <h2>LuckySocial</h2>
-  <p>Share your moments with friends</p>
-
-  <input id="username" type="text" placeholder="Username">
-  <input id="password" type="password" placeholder="Password">
-
-  <button class="primary-btn" onclick="login()">Log In</button>
-
-  <p class="signup-text">
-    Don't have an account?
-    <button class="link-btn" onclick="showSignup()">Sign up</button>
-  </p>
-</section>
-
-<section id="signupSection" class="auth-card hidden">
-  <h2>Create account</h2>
-
-  <input id="signupUsername" type="text" placeholder="Username">
-  <input id="signupPassword" type="password" placeholder="Password">
-
-  <button class="primary-btn" onclick="signup()">Sign Up</button>
-
-  <p class="signup-text">
-    Already have an account?
-    <button class="link-btn" onclick="showLogin()">Log in</button>
-  </p>
-</section>
-
-<section id="feedSection" class="hidden">
-
-  <div class="stories">
-    <div class="story">
-      <div class="story-img">＋</div>
-      <span>Your story</span>
-    </div>
-
-    <div class="story">
-      <div class="story-img">L</div>
-      <span>Lucky</span>
-    </div>
-
-    <div class="story">
-      <div class="story-img">S</div>
-      <span>Friends</span>
-    </div>
-
-    <div class="story">
-      <div class="story-img">A</div>
-      <span>Ajay</span>
-    </div>
-  </div>
-
-  <div id="posts"></div>
 
 </section>
 
-</main>
 
-<nav id="bottomNav" class="bottom-nav hidden">
-  <button onclick="loadPosts()">⌂</button>
-  <button>⌕</button>
-  <button onclick="showCreate()">＋</button>
-  <button>♡</button>
-  <button>👤</button>
-</nav>
+<!-- ================= SIGNUP ================= -->
 
-<div id="createBox" class="modal hidden">
-  <div class="modal-content">
-    <button class="close-btn" onclick="hideCreate()">×</button>
-    <h2>Create post</h2>
+<section id="signupSection" class="auth-screen hidden">
 
-    <textarea id="postText" placeholder="What's on your mind?"></textarea>
+  <div class="auth-card">
 
-    <button class="primary-btn" onclick="createPost()">Post</button>
+    <div class="brand">LuckySocial</div>
+
+    <p class="auth-subtitle">
+      Create your account.
+    </p>
+
+    <input
+      id="signupUsername"
+      type="text"
+      placeholder="Username"
+      autocomplete="username"
+    >
+
+    <input
+      id="signupPassword"
+      type="password"
+      placeholder="Password"
+      autocomplete="new-password"
+    >
+
+    <button class="primary-btn" onclick="signup()">
+      Sign up
+    </button>
+
+    <div id="signupMessage"></div>
+
+    <p class="switch-auth">
+      Already have an account?
+      <button onclick="showLogin()">Log in</button>
+    </p>
+
   </div>
+
+</section>
+
+
+<!-- ================= APP ================= -->
+
+<div id="app" class="hidden">
+
+  <!-- TOP BAR -->
+
+  <header class="topbar">
+
+    <button class="brand-small" onclick="showPage('home')">
+      LuckySocial
+    </button>
+
+    <div class="top-icons">
+
+      <button onclick="showPage('search')" aria-label="Search">
+        ⌕
+      </button>
+
+      <button onclick="openCreate()" aria-label="Create">
+        ＋
+      </button>
+
+      <button onclick="showPage('notifications')" aria-label="Notifications">
+        ♡
+      </button>
+
+      <button onclick="showPage('messages')" aria-label="Messages">
+        ✉
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ================= MAIN ================= -->
+
+  <main id="mainContent">
+
+
+    <!-- HOME -->
+
+    <section id="homePage" class="page">
+
+      <!-- STORIES -->
+
+      <div class="stories-card">
+
+        <div
+          class="story-item"
+          onclick="openStoryCreate()"
+        >
+
+          <div class="story-ring add-story">
+            <div class="story-avatar">
+              <span>＋</span>
+            </div>
+          </div>
+
+          <span>Your story</span>
+
+        </div>
+
+        <div id="storiesList" class="stories-list"></div>
+
+      </div>
+
+
+      <!-- FEED -->
+
+      <div id="feed">
+
+        <div class="loading">
+          Loading posts...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SEARCH -->
+
+    <section id="searchPage" class="page hidden">
+
+      <div class="section-heading">
+        <h2>Search</h2>
+      </div>
+
+      <div class="search-input-wrap">
+
+        <span>⌕</span>
+
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search"
+          oninput="searchUsers()"
+        >
+
+      </div>
+
+      <div id="searchResults"></div>
+
+    </section>
+
+
+    <!-- REELS -->
+
+    <section id="reelsPage" class="page hidden">
+
+      <div class="section-heading">
+        <h2>Reels</h2>
+      </div>
+
+      <div class="reels-container">
+
+        <div class="reel-placeholder">
+
+          <div class="reel-play">▶</div>
+
+          <h3>Reels</h3>
+
+          <p>
+            Your short videos will appear here.
+          </p>
+
+          <button
+            class="primary-btn small-btn"
+            onclick="openCreate()"
+          >
+            Create Reel
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CREATE -->
+
+    <section id="createPage" class="page hidden">
+
+      <div class="section-heading">
+
+        <h2>Create new post</h2>
+
+        <button onclick="showPage('home')">
+          ×
+        </button>
+
+      </div>
+
+      <div class="create-card">
+
+        <label class="upload-box">
+
+          <div class="upload-icon">
+            ＋
+          </div>
+
+          <strong>
+            Select photo or video
+          </strong>
+
+          <small>
+            Share a photo or video with your followers
+          </small>
+
+          <input
+            id="mediaInput"
+            type="file"
+            accept="image/*,video/*"
+            onchange="previewMedia(event)"
+          >
+
+        </label>
+
+        <div id="mediaPreview"></div>
+
+        <textarea
+          id="postText"
+          placeholder="Write a caption..."
+          maxlength="2200"
+        ></textarea>
+
+        <button
+          class="primary-btn"
+          onclick="createPost()"
+        >
+          Share
+        </button>
+
+        <div id="createMessage"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- NOTIFICATIONS -->
+
+    <section id="notificationsPage" class="page hidden">
+
+      <div class="section-heading">
+
+        <h2>Notifications</h2>
+
+        <button onclick="markAllNotificationsRead()">
+          ✓
+        </button>
+
+      </div>
+
+      <div id="notificationsList">
+
+        <div class="empty-state">
+          No notifications yet.
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- MESSAGES -->
+
+    <section id="messagesPage" class="page hidden">
+
+      <div class="section-heading">
+
+        <h2>Messages</h2>
+
+      </div>
+
+      <div class="search-input-wrap">
+
+        <span>⌕</span>
+
+        <input
+          id="messageSearch"
+          placeholder="Search"
+        >
+
+      </div>
+
+      <div id="conversationList">
+
+        <div class="empty-state">
+          Search a user to start chatting.
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PROFILE -->
+
+    <section id="profilePage" class="page hidden">
+
+      <div id="profileContent">
+
+        <div class="loading">
+          Loading profile...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- USER PROFILE -->
+
+    <section id="userProfilePage" class="page hidden">
+
+      <div id="userProfileContent">
+
+        <div class="loading">
+          Loading profile...
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================= BOTTOM NAV ================= -->
+
+  <nav class="bottom-nav">
+
+    <button
+      data-page="home"
+      onclick="showPage('home')"
+    >
+      <span>⌂</span>
+      <small>Home</small>
+    </button>
+
+    <button
+      data-page="search"
+      onclick="showPage('search')"
+    >
+      <span>⌕</span>
+      <small>Search</small>
+    </button>
+
+    <button
+      class="create-nav"
+      onclick="openCreate()"
+    >
+      <span>＋</span>
+      <small>Create</small>
+    </button>
+
+    <button
+      data-page="reels"
+      onclick="showPage('reels')"
+    >
+      <span>▶</span>
+      <small>Reels</small>
+    </button>
+
+    <button
+      data-page="profile"
+      onclick="showProfile()"
+    >
+      <span id="navProfileIcon">●</span>
+      <small>Profile</small>
+    </button>
+
+  </nav>
+
 </div>
 
-<script src="script.js"></script>
+
+<!-- ================= POST MODAL ================= -->
+
+<div
+  id="postModal"
+  class="modal hidden"
+  onclick="closeModalOutside(event)"
+>
+
+  <div class="modal-card post-modal-card">
+
+    <div class="modal-header">
+
+      <strong>Post</strong>
+
+      <button onclick="closeModal()">
+        ×
+      </button>
+
+    </div>
+
+    <div id="modalPost"></div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= STORY VIEWER ================= -->
+
+<div
+  id="storyModal"
+  class="modal story-modal hidden"
+>
+
+  <div class="story-viewer">
+
+    <button
+      class="story-close"
+      onclick="closeStory()"
+    >
+      ×
+    </button>
+
+    <div id="storyContent"></div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= STORY CREATE ================= -->
+
+<div
+  id="storyCreateModal"
+  class="modal hidden"
+>
+
+  <div class="modal-card">
+
+    <div class="modal-header">
+
+      <strong>Create story</strong>
+
+      <button onclick="closeStoryCreate()">
+        ×
+      </button>
+
+    </div>
+
+    <label class="upload-box story-upload">
+
+      <div class="upload-icon">
+        ＋
+      </div>
+
+      <strong>
+        Select photo or video
+      </strong>
+
+      <input
+        id="storyInput"
+        type="file"
+        accept="image/*,video/*"
+        onchange="previewStory(event)"
+      >
+
+    </label>
+
+    <div id="storyPreview"></div>
+
+    <div class="modal-padding">
+
+      <button
+        class="primary-btn"
+        onclick="publishStory()"
+      >
+        Add to story
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= CHAT ================= -->
+
+<div
+  id="chatModal"
+  class="modal hidden"
+>
+
+  <div class="chat-window">
+
+    <div class="chat-header">
+
+      <button onclick="closeChat()">
+        ‹
+      </button>
+
+      <strong id="chatName">
+        Chat
+      </strong>
+
+    </div>
+
+    <div id="chatMessages" class="chat-messages"></div>
+
+    <div class="chat-input">
+
+      <input
+        id="chatText"
+        placeholder="Message..."
+        onkeydown="if(event.key==='Enter') sendMessage()"
+      >
+
+      <button onclick="sendMessage()">
+        ➤
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script src="/script.js"></script>
+
 </body>
 </html>
+EOF
